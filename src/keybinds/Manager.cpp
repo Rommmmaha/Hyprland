@@ -384,7 +384,7 @@ bool CKeybindManager::onMouseEvent(const IPointer::SButtonEvent& event, SP<IPoin
 
         m_inputState.setForwarded(KEY, pointer, result.passEvent);
         if (!result.passEvent)
-            shadowBinds();
+            shadowBinds(KEY, pointer);
         return result.passEvent && !DRAG_WAS_ACTIVE;
     }
 
