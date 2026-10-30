@@ -764,6 +764,8 @@ void CKeybindManager::shadowBinds(const std::optional<SResolvedKey>& excluded, c
                                 [&bind](const auto& input) { return std::ranges::any_of(input.deferredBinds, [&bind](const auto& weak) { return weak.lock() == bind; }); }))
             continue;
 
+        // Only a mod-tap is shadowed by its own held key, so a modifier consumed by a combo doesn't
+        // also fire the tap. Other release binds stay invokable while held.
         // Multi-key release binds retain their armed state as earlier chord keys are released.
         // Their overlap suppression is tracked on the armed input instead of through m_shadowed.
         const bool MATCH_RELEASE = bind->hasFlag(BIND_FLAG_RELEASE) && bind->chordSize() <= 1;
@@ -781,7 +783,7 @@ void CKeybindManager::shadowBinds(const std::optional<SResolvedKey>& excluded, c
                 .trigger          = input.key,
                 .modifiersNow     = MODIFIERS,
                 .modifiersAtPress = input.modifiersAtPress,
-                .pressed          = !MATCH_RELEASE,
+                .pressed          = !(MATCH_RELEASE && input.key.modifier),
                 .device           = device,
                 .submap           = input.submapAtPress,
             };
